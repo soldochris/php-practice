@@ -8,19 +8,26 @@ require_once "consts.php";
 //import functions
 require_once "functions.php";
 
-//storing the data 
-$data = get_data(API_URL);
+//importing the next movie
+require_once "classes/NextMovie.php";
 
-//getting the correct until message
-$untilMessage = get_until_message($data["days_until"]);
+//creating the next movie with the static method passing the API_URL
+$next_movie = NextMovie::fetch_and_create_movie(API_URL);
 
-//importing head
-require_once "sections/head.php";
+//getting the data from the next movie
+$next_movie_data = $next_movie->get_data();
 
-//importing styles
-require_once "sections/styles.php";
+//render head and pass the necessary data
+render_template("head", $next_movie_data);
 
-//importing main
-require_once "sections/main.php";
+//render styles
+render_template("styles");
+
+//render main and pass the necessary data merging the data object
+//with result of calling the get_until_message method
+render_template("main", array_merge(
+  $next_movie_data, 
+  ["until_message" => $next_movie->get_until_message()]
+));
 
 ?>
